@@ -33,6 +33,17 @@
     "win": {
       "target": "portable"
     },
-    "forceCodeSigning": false
+    "forceCodeSigning": false,
+    "asar": true,
+    "asarUnpack": [],
+    "compression": "maximum",
+    "electronLanguages": ["zh-CN", "en-US"],
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html",
+      "style.css"
+    ],
+    "afterPack": "build/afterPack.js"
   }
 }

@@ -709,6 +709,75 @@
         .el-message-fade-leave {
             animation: message-fade-out 0.3s forwards;
         }
+    /* 设置界面布局 */
+    .settings-layout {
+        display: flex;
+        height: calc(100vh - 60px);
+        overflow: hidden;
+    }
+
+    /* 左侧设置项导航 */
+    .settings-sidebar {
+        width: 200px;
+        background: var(--ios-card);
+        border-right: 1px solid var(--ios-gray-light);
+        padding: 16px 0;
+        overflow-y: auto;
+    }
+
+    /* 设置项按钮样式 */
+    .settings-item {
+        display: block;
+        width: 100%;
+        padding: 16px 20px;
+        border: none;
+        background: transparent;
+        text-align: left;
+        font-size: 16px;
+        color: var(--ios-text-primary);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-family: inherit;
+        letter-spacing: -0.3px;
+    }
+
+    /* 设置项悬停效果 */
+    .settings-item:hover {
+        background-color: var(--ios-background);
+    }
+
+    /* 设置项激活状态 */
+    .settings-item.active {
+        background-color: rgba(0, 122, 255, 0.1);
+        color: var(--ios-primary);
+        font-weight: 600;
+    }
+
+    /* 右侧设置内容区 */
+    .settings-content {
+        flex: 1;
+        padding: 24px;
+        overflow-y: auto;
+        background: var(--ios-background);
+    }
+
+    /* 设置内容卡片 */
+    .settings-section {
+        background: var(--ios-card);
+        padding: 24px;
+        border-radius: var(--ios-corner-large);
+        box-shadow: var(--ios-shadow-sm);
+        margin-bottom: 24px;
+    }
+
+    /* 设置内容标题 */
+    .settings-section h3 {
+        font-size: 20px;
+        margin-bottom: 20px;
+        color: var(--ios-text-primary);
+        font-weight: 700;
+        letter-spacing: -0.4px;
+    }
     </style>
 </head>
 <body>
@@ -753,6 +822,10 @@
     <div id="passwordManagerScreen" class="container">
         <header>
             <h1>PassBox - 本地密码管理器</h1>
+            <!-- 设置按钮 -->
+            <button class="btn btn-small" onclick="showSettingsScreen()" style="position: absolute; right: 20px; top: 16px;">
+                <span class="btn-icon">⚙️</span> 设置
+            </button>
             <!-- iOS 导航栏按钮容器 -->
             <div style="margin-top: 16px; display: flex; gap: 12px; justify-content: center; padding: 0 20px;">
                 <button class="btn btn-success btn-small" onclick="showAddPasswordScreen()">
@@ -760,6 +833,9 @@
                 </button>
                 <button class="btn btn-primary btn-small" onclick="showSavedPasswordsScreen()">
                      查看已保存密码
+                </button>
+                <button class="btn btn-secondary btn-small" onclick="lockApplication()">
+                     <span class="btn-icon">🔒</span> 应用锁定
                 </button>
             </div>
         </header>
@@ -804,8 +880,127 @@
             <!-- 已保存密码界面 -->
             <div id="savedPasswordsScreen" style="display: none; overflow: hidden; height: 100%; flex: 1;">
                 <div class="passwords-section" style="height: 100%;">
-                    <h2>已保存的密码</h2>
-                    <div id="passwordsList" style="overflow-y: auto; height: calc(100% - 50px);"></div>
+                    <div id="passwordsList" style="overflow-y: auto; height: 100%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 设置界面 -->
+    <div id="settingsScreen" style="display: none; height: 100vh; overflow: hidden; background-color: var(--ios-background);">
+        <!-- 顶部导航栏 -->
+        <div style="background: var(--ios-card); border-bottom: 1px solid var(--ios-gray-light); padding: 0 24px; overflow-x: auto;">
+            <div style="display: flex; gap: 0; min-width: max-content; align-items: center;">
+                <!-- 返回按钮 -->
+                <button onclick="showPasswordManagerScreen()" style="padding: 16px; border: none; background: transparent; font-size: 18px; color: var(--ios-primary); margin-right: 16px; min-width: auto;">←</button>
+                <!-- 标签导航 -->
+                <div style="display: flex; gap: 0; flex: 1;">
+                    <button class="settings-tab active" onclick="showSetting('appearance')" style="padding: 16px 24px; border: none; background: transparent; font-size: 16px; color: var(--ios-primary); font-weight: 600; border-bottom: 2px solid var(--ios-primary); flex: 1; min-width: 120px;">外观设置</button>
+                    <button class="settings-tab" onclick="showSetting('security')" style="padding: 16px 24px; border: none; background: transparent; font-size: 16px; color: var(--ios-text-secondary); border-bottom: 2px solid transparent; flex: 1; min-width: 120px;">安全设置</button>
+                    <button class="settings-tab" onclick="showSetting('about')" style="padding: 16px 24px; border: none; background: transparent; font-size: 16px; color: var(--ios-text-secondary); border-bottom: 2px solid transparent; flex: 1; min-width: 120px;">关于</button>
+                </div>
+                <!-- 锁定按钮 -->
+                <button class="btn btn-small" onclick="lockApplication()" style="margin-left: 16px; padding: 8px 16px; min-width: auto;">
+                    <span class="btn-icon">🔒</span> 锁定
+                </button>
+            </div>
+        </div>
+        
+        <!-- 设置内容区域 -->
+        <div style="padding: 24px; height: calc(100vh - 60px); overflow-y: auto;">
+            <!-- 外观设置 -->
+            <div id="appearanceSetting" class="settings-content-panel" style="display: block;">
+                <div style="background: var(--ios-card); border-radius: var(--ios-corner-large); padding: 24px; box-shadow: var(--ios-shadow-sm);">
+                    <h3 style="margin-bottom: 24px; font-size: 20px; font-weight: 700;">外观设置</h3>
+                    
+                    <!-- 自定义背景图片设置 -->
+                    <div style="margin-bottom: 24px;">
+                        <label for="customBackground" style="display: block; margin-bottom: 12px; font-weight: 500;">自定义背景图片</label>
+                        <input type="file" id="customBackground" name="customBackground" accept="image/*" style="width: 100%; padding: 8px; border: 1px solid var(--ios-gray-light); border-radius: var(--ios-corner-medium); background: var(--ios-background);">
+                        <p style="margin-top: 8px; font-size: 14px; color: var(--ios-text-secondary);">选择一张图片作为应用背景 <span id="appAspectRatio" style="margin-left: 8px; color: var(--ios-primary); font-weight: 500;"></span></p>
+                    </div>
+                    
+                    <!-- 背景预览 -->
+                    <div style="margin-bottom: 24px;">
+                        <label style="display: block; margin-bottom: 12px; font-weight: 500;">背景预览</label>
+                        <div id="backgroundPreview" style="width: 100%; height: 200px; background-color: var(--ios-background); border-radius: var(--ios-corner-medium); margin-top: 8px; display: flex; justify-content: center; align-items: center; border: 1px solid var(--ios-gray-light);">
+                            <span style="color: var(--ios-text-tertiary);">当前无自定义背景</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 保存和重置按钮 -->
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn btn-primary" onclick="saveSettings()" style="width: auto; min-width: 120px;">保存设置</button>
+                        <button class="btn btn-secondary" onclick="resetBackground()" style="width: auto; min-width: 120px;">重置为默认背景</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 安全设置 -->
+            <div id="securitySetting" class="settings-content-panel" style="display: none;">
+                <div style="background: var(--ios-card); border-radius: var(--ios-corner-large); padding: 24px; box-shadow: var(--ios-shadow-sm);">
+                    <h3 style="margin-bottom: 24px; font-size: 20px; font-weight: 700;">安全设置</h3>
+                    
+                    <div style="margin-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--ios-gray-light);">
+                            <span style="font-size: 16px;">自动锁定时间</span>
+                            <select style="padding: 8px 12px; border-radius: var(--ios-corner-medium); border: 1px solid var(--ios-gray-light); background: var(--ios-background); font-size: 14px;">
+                                <option>1分钟</option>
+                                <option>5分钟</option>
+                                <option>10分钟</option>
+                                <option>30分钟</option>
+                                <option>1小时</option>
+                                <option>从不</option>
+                            </select>
+                        </div>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--ios-gray-light);">
+                            <span style="font-size: 16px;">启用自动备份</span>
+                            <input type="checkbox" style="width: 20px; height: 20px; accent-color: var(--ios-primary);">
+                        </div>
+                        
+                        <!-- 最小化自动锁定设置 -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--ios-gray-light);">
+                            <span style="font-size: 16px;">最小化时自动锁定</span>
+                            <input type="checkbox" id="enableMinimizeLock" style="width: 20px; height: 20px; accent-color: var(--ios-primary);">
+                        </div>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--ios-gray-light);">
+                            <span style="font-size: 16px;">最小化锁定延迟</span>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <select id="minimizeLockDelay" style="padding: 8px 12px; border-radius: var(--ios-corner-medium); border: 1px solid var(--ios-gray-light); background: var(--ios-background); font-size: 14px;">
+                                    <option value="0">立即锁定</option>
+                                    <option value="30000">30秒</option>
+                                    <option value="60000">1分钟</option>
+                                    <option value="300000">5分钟</option>
+                                    <option value="600000">10分钟</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 保存设置按钮 -->
+                    <div style="display: flex; gap: 12px; margin-top: 24px;">
+                        <button class="btn btn-primary" onclick="saveSettings()" style="width: auto; min-width: 120px;">保存设置</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 关于 -->
+            <div id="aboutSetting" class="settings-content-panel" style="display: none;">
+                <div style="background: var(--ios-card); border-radius: var(--ios-corner-large); padding: 24px; box-shadow: var(--ios-shadow-sm);">
+                    <h3 style="margin-bottom: 24px; font-size: 20px; font-weight: 700;">关于 PassBox</h3>
+                    
+                    <div style="margin-bottom: 24px;">
+                        <p style="margin-bottom: 8px; font-size: 16px;">版本：1.0.0</p>
+                        <p style="font-size: 16px; color: var(--ios-text-secondary);">本地密码管理器，安全可靠</p>
+                    </div>
+                    
+                    <div style="padding: 16px; background-color: var(--ios-background); border-radius: var(--ios-corner-medium);">
+                        <p style="font-size: 14px; color: var(--ios-text-secondary); line-height: 1.6;">
+                            PassBox 是一款本地密码管理器，所有数据均存储在您的设备上，确保您的密码安全可靠。
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -816,6 +1011,7 @@
         const authScreen = document.getElementById('authScreen');
         const setupScreen = document.getElementById('setupScreen');
         const passwordManagerScreen = document.getElementById('passwordManagerScreen');
+        const settingsScreen = document.getElementById('settingsScreen');
         const addPasswordScreen = document.getElementById('addPasswordScreen');
         const savedPasswordsScreen = document.getElementById('savedPasswordsScreen');
         const loginError = document.getElementById('loginError');
@@ -879,6 +1075,642 @@
             // 加载最新的密码列表
             await loadPasswords();
         }
+        
+        // 导航函数：显示密码管理器主界面
+        function showPasswordManagerScreen() {
+            settingsScreen.style.display = 'none';
+            passwordManagerScreen.style.display = 'block';
+        }
+        
+        // 导航函数：显示设置界面
+        function showSettingsScreen() {
+            passwordManagerScreen.style.display = 'none';
+            settingsScreen.style.display = 'block';
+            
+            // 默认显示外观设置
+            showSetting('appearance');
+        }
+        
+        // 导航函数：显示特定设置项
+        function showSetting(settingName) {
+            // 更新顶部标签激活状态
+            const settingTabs = document.querySelectorAll('.settings-tab');
+            settingTabs.forEach(tab => {
+                tab.classList.remove('active');
+                tab.style.color = 'var(--ios-text-secondary)';
+                tab.style.borderBottom = '2px solid transparent';
+            });
+            
+            // 找到对应的标签并激活
+            const targetTab = document.querySelector(`[onclick="showSetting('${settingName}')"]`);
+            if (targetTab) {
+                targetTab.classList.add('active');
+                targetTab.style.color = 'var(--ios-primary)';
+                targetTab.style.borderBottom = '2px solid var(--ios-primary)';
+            }
+            
+            // 切换内容显示
+            const settingContents = document.querySelectorAll('[id$="Setting"]');
+            settingContents.forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            const targetContent = document.getElementById(`${settingName}Setting`);
+            if (targetContent) {
+                targetContent.style.display = 'block';
+            }
+        }
+        
+        // 应用锁定功能
+        function lockApplication() {
+            // 记录锁定日志
+            logLockEvent();
+            
+            // 清除所有会话数据和临时存储的认证信息
+            clearSessionData();
+            
+            // 重置所有界面状态
+            resetAllScreens();
+            
+            // 重定向到登录界面
+            showLoginScreen();
+        }
+        
+        // 记录锁定事件
+        function logLockEvent() {
+            // 记录锁定时间和上下文信息
+            const lockTime = new Date().toISOString();
+            const currentScreen = getCurrentScreen();
+            const lockLog = {
+                timestamp: lockTime,
+                event: 'application_locked',
+                currentScreen: currentScreen,
+                userAgent: navigator.userAgent
+            };
+            
+            // 简单的日志记录，实际项目中可以考虑更复杂的日志系统
+            console.log('🔒 应用锁定事件:', lockLog);
+            
+            // 可以选择将日志存储到localStorage或其他持久化存储中
+            try {
+                const logs = JSON.parse(localStorage.getItem('lockLogs') || '[]');
+                logs.push(lockLog);
+                // 只保留最近100条日志
+                if (logs.length > 100) {
+                    logs.shift();
+                }
+                localStorage.setItem('lockLogs', JSON.stringify(logs));
+            } catch (error) {
+                console.error('保存锁定日志失败:', error);
+            }
+        }
+        
+        // 清除会话数据
+        function clearSessionData() {
+            // 这里可以根据实际情况清除更多会话数据
+            // 例如：清除表单数据、清除临时存储的密码等
+            
+            // 清除表单数据
+            const passwordForm = document.getElementById('passwordForm');
+            if (passwordForm) {
+                passwordForm.reset();
+            }
+            
+            // 清除登录表单数据
+            const loginPassword = document.getElementById('loginPassword');
+            if (loginPassword) {
+                loginPassword.value = '';
+            }
+            
+            // 清除设置表单数据
+            const customBackground = document.getElementById('customBackground');
+            if (customBackground) {
+                customBackground.value = '';
+            }
+            
+            // 调用后端锁定接口（如果有）
+            try {
+                if (window.passwordManager && window.passwordManager.lock) {
+                    window.passwordManager.lock();
+                }
+            } catch (error) {
+                console.error('调用锁定接口失败:', error);
+            }
+        }
+        
+        // 重置所有界面状态
+        function resetAllScreens() {
+            // 隐藏所有界面
+            passwordManagerScreen.style.display = 'none';
+            settingsScreen.style.display = 'none';
+            
+            // 隐藏设置项内容
+            const settingContents = document.querySelectorAll('[id$="Setting"]');
+            settingContents.forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // 重置设置标签状态
+            const settingTabs = document.querySelectorAll('.settings-tab');
+            settingTabs.forEach(tab => {
+                tab.classList.remove('active');
+                tab.style.color = 'var(--ios-text-secondary)';
+                tab.style.borderBottom = '2px solid transparent';
+            });
+        }
+        
+        // 显示登录界面
+        function showLoginScreen() {
+            // 显示登录界面
+            authScreen.style.display = 'block';
+            setupScreen.style.display = 'none';
+            
+            // 确保登录错误信息已清除
+            const loginError = document.getElementById('loginError');
+            if (loginError) {
+                loginError.textContent = '';
+            }
+        }
+        
+        // 获取当前屏幕
+        function getCurrentScreen() {
+            if (passwordManagerScreen.style.display === 'block') {
+                if (addPasswordScreen.style.display === 'block') {
+                    return 'add_password_screen';
+                } else if (savedPasswordsScreen.style.display === 'block') {
+                    return 'saved_passwords_screen';
+                }
+            } else if (settingsScreen.style.display === 'block') {
+                return 'settings_screen';
+            }
+            return 'unknown_screen';
+        }
+        
+        // 保存设置
+        function saveSettings() {
+            // 获取所有设置项
+            const settings = {
+                // 外观设置
+                appearance: {
+                    customBackground: null
+                },
+                // 安全设置
+                security: {
+                    autoLockTime: '1分钟', // 默认值
+                    enableAutoBackup: false // 默认值
+                }
+            };
+            
+            // 处理外观设置
+            const customBackgroundInput = document.getElementById('customBackground');
+            if (customBackgroundInput && customBackgroundInput.files[0]) {
+                const file = customBackgroundInput.files[0];
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    settings.appearance.customBackground = {
+                        url: event.target.result,
+                        size: 'cover',
+                        applied: true
+                    };
+                    
+                    // 应用背景到页面
+                    document.body.style.backgroundImage = `url(${event.target.result})`;
+                    document.body.style.backgroundSize = 'cover';
+                    document.body.style.backgroundPosition = 'center';
+                    document.body.style.backgroundRepeat = 'no-repeat';
+                    document.body.style.backgroundAttachment = 'fixed';
+                    
+                    // 保存所有设置
+                    saveAllSettings(settings);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                // 保存所有设置（不包含背景图片）
+                saveAllSettings(settings);
+            }
+        }
+        
+        // 保存所有设置到localStorage
+        function saveAllSettings(settings) {
+            // 获取安全设置
+            const autoLockTimeSelect = document.querySelector('#securitySetting select');
+            const enableAutoBackupCheckbox = document.querySelector('#securitySetting input[type="checkbox"]');
+            const enableMinimizeLockCheckbox = document.getElementById('enableMinimizeLock');
+            const minimizeLockDelaySelect = document.getElementById('minimizeLockDelay');
+            
+            if (autoLockTimeSelect) {
+                settings.security.autoLockTime = autoLockTimeSelect.value;
+            }
+            
+            if (enableAutoBackupCheckbox) {
+                settings.security.enableAutoBackup = enableAutoBackupCheckbox.checked;
+            }
+            
+            // 保存最小化自动锁定设置
+            if (enableMinimizeLockCheckbox) {
+                settings.security.enableMinimizeLock = enableMinimizeLockCheckbox.checked;
+            }
+            
+            if (minimizeLockDelaySelect) {
+                settings.security.minimizeLockDelay = parseInt(minimizeLockDelaySelect.value);
+            }
+            
+            // 保存到localStorage
+            localStorage.setItem('appSettings', JSON.stringify(settings));
+            
+            // 重新初始化自动锁定计时器
+            initAutoLockTimer();
+            
+            message.success('所有设置已保存');
+        }
+        
+        // 初始化设置界面
+        document.addEventListener('DOMContentLoaded', () => {
+            // 监听自定义背景图片选择
+            const customBackgroundInput = document.getElementById('customBackground');
+            const backgroundPreview = document.getElementById('backgroundPreview');
+            
+            if (customBackgroundInput && backgroundPreview) {
+                customBackgroundInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            backgroundPreview.style.backgroundImage = `url('${event.target.result}')`;
+                            backgroundPreview.style.backgroundSize = 'cover';
+                            backgroundPreview.style.backgroundPosition = 'center';
+                            backgroundPreview.innerHTML = '';
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+            
+            // 初始化背景预览尺寸
+            updateBackgroundPreviewSize();
+            
+            // 添加窗口大小变化监听
+            window.addEventListener('resize', updateBackgroundPreviewSize);
+            
+            // 加载所有已保存的设置
+            loadSettings();
+            
+            // 初始化自动锁定计时器
+            initAutoLockTimer();
+            
+            // 监听用户活动，重置自动锁定计时器
+            document.addEventListener('mousemove', resetAutoLockTimer);
+            document.addEventListener('keypress', resetAutoLockTimer);
+            document.addEventListener('click', resetAutoLockTimer);
+            
+            // 监听窗口状态变化（最小化/恢复）
+            setupWindowStateListeners();
+        });
+        
+        // 更新背景预览尺寸，使其匹配应用程序的实际宽高比例
+        function updateBackgroundPreviewSize() {
+            const backgroundPreview = document.getElementById('backgroundPreview');
+            const appAspectRatio = document.getElementById('appAspectRatio');
+            if (!backgroundPreview) return;
+            
+            try {
+                // 获取应用程序的实际宽高
+                const appWidth = window.innerWidth;
+                const appHeight = window.innerHeight;
+                
+                // 计算宽高比
+                const aspectRatio = appWidth / appHeight;
+                
+                // 格式化宽高比显示（例如：16:9, 4:3, 1:1）
+                const formattedRatio = formatAspectRatio(appWidth, appHeight);
+                
+                // 更新宽高比例信息显示
+                if (appAspectRatio) {
+                    appAspectRatio.textContent = `(应用宽高比: ${formattedRatio}, 实际尺寸: ${appWidth}x${appHeight}px)`;
+                }
+                
+                // 设置预览区域的最大宽度和高度
+                const maxPreviewHeight = 300; // 最大预览高度，可根据实际情况调整
+                const maxPreviewWidth = 500; // 最大预览宽度，可根据实际情况调整
+                
+                // 根据宽高比计算预览区域的实际尺寸
+                let previewWidth, previewHeight;
+                
+                if (aspectRatio > 1) {
+                    // 横向屏幕
+                    previewWidth = Math.min(maxPreviewWidth, maxPreviewHeight * aspectRatio);
+                    previewHeight = previewWidth / aspectRatio;
+                } else {
+                    // 纵向屏幕
+                    previewHeight = Math.min(maxPreviewHeight, maxPreviewWidth / aspectRatio);
+                    previewWidth = previewHeight * aspectRatio;
+                }
+                
+                // 更新预览区域的尺寸
+                backgroundPreview.style.width = `${previewWidth}px`;
+                backgroundPreview.style.height = `${previewHeight}px`;
+                backgroundPreview.style.maxWidth = '100%';
+                backgroundPreview.style.objectFit = 'contain';
+                
+                console.log(`🔍 背景预览尺寸已更新：${previewWidth}x${previewHeight}px，应用尺寸：${appWidth}x${appHeight}px，比例：${aspectRatio.toFixed(2)}`);
+            } catch (error) {
+                console.error('🔍 更新背景预览尺寸失败：', error);
+            }
+        }
+        
+        // 格式化宽高比，返回简化的比例字符串（例如：16:9, 4:3, 1:1）
+        function formatAspectRatio(width, height) {
+            // 计算最大公约数
+            function gcd(a, b) {
+                return b === 0 ? a : gcd(b, a % b);
+            }
+            
+            const commonDivisor = gcd(width, height);
+            const ratioWidth = width / commonDivisor;
+            const ratioHeight = height / commonDivisor;
+            
+            return `${ratioWidth}:${ratioHeight}`;
+        }
+        
+        // 设置窗口状态监听器
+        function setupWindowStateListeners() {
+            try {
+                // 检查是否在Electron环境中
+                if (window.electron) {
+                    // 使用Electron的窗口事件监听
+                    window.electron.on('window-minimize', handleWindowMinimize);
+                    window.electron.on('window-restore', handleWindowRestore);
+                    console.log('🔒 已设置Electron窗口状态监听器');
+                } else if (window.require) {
+                    // 直接使用Electron的remote模块（旧版本Electron）
+                    try {
+                        const { remote } = window.require('electron');
+                        const currentWindow = remote.getCurrentWindow();
+                        
+                        currentWindow.on('minimize', handleWindowMinimize);
+                        currentWindow.on('restore', handleWindowRestore);
+                        console.log('🔒 已设置Electron remote窗口状态监听器');
+                    } catch (error) {
+                        console.warn('🔒 使用Electron remote失败:', error.message);
+                        // 降级方案：使用定时器检查可见性变化
+                        setupVisibilityChangeListener();
+                    }
+                } else {
+                    // 降级方案：使用定时器检查可见性变化
+                    setupVisibilityChangeListener();
+                }
+            } catch (error) {
+                console.error('🔒 设置窗口状态监听器失败:', error);
+                // 降级方案：使用定时器检查可见性变化
+                setupVisibilityChangeListener();
+            }
+        }
+        
+        // 设置可见性变化监听器（降级方案）
+        function setupVisibilityChangeListener() {
+            // 监听文档可见性变化
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    // 文档不可见，可能是最小化或切换到其他窗口
+                    handleWindowMinimize();
+                } else {
+                    // 文档可见，恢复正常
+                    handleWindowRestore();
+                }
+            });
+            console.log('🔒 已设置可见性变化监听器');
+        }
+        
+        // 处理窗口最小化事件
+        function handleWindowMinimize() {
+            try {
+                console.log('🔒 窗口已最小化');
+                isMinimized = true;
+                
+                // 获取最小化自动锁定设置
+                const settings = JSON.parse(localStorage.getItem('appSettings') || '{}');
+                const enableMinimizeLock = settings.security?.enableMinimizeLock || false;
+                
+                if (enableMinimizeLock) {
+                    const minimizeLockDelay = settings.security?.minimizeLockDelay || 0;
+                    console.log(`🔒 最小化自动锁定已启用，将在 ${minimizeLockDelay / 1000} 秒后锁定`);
+                    
+                    // 清除现有计时器
+                    if (minimizeLockTimer) {
+                        clearTimeout(minimizeLockTimer);
+                    }
+                    
+                    // 设置新的计时器
+                    minimizeLockTimer = setTimeout(() => {
+                        try {
+                            // 检查是否仍处于最小化状态
+                            if (isMinimized) {
+                                console.log('🔒 最小化锁定时间已到，执行锁定');
+                                lockApplication();
+                            }
+                        } catch (error) {
+                            console.error('🔒 最小化锁定执行失败:', error);
+                        }
+                    }, minimizeLockDelay);
+                } else {
+                    console.log('🔒 最小化自动锁定已禁用');
+                }
+            } catch (error) {
+                console.error('🔒 处理窗口最小化事件失败:', error);
+            }
+        }
+        
+        // 处理窗口恢复事件
+        function handleWindowRestore() {
+            try {
+                console.log('🔒 窗口已恢复');
+                isMinimized = false;
+                
+                // 清除最小化锁定计时器
+                if (minimizeLockTimer) {
+                    clearTimeout(minimizeLockTimer);
+                    minimizeLockTimer = null;
+                    console.log('🔒 最小化锁定计时器已清除');
+                }
+            } catch (error) {
+                console.error('🔒 处理窗口恢复事件失败:', error);
+            }
+        }
+        
+        // 加载所有设置
+        function loadSettings() {
+            // 加载背景设置
+            loadCustomBackground();
+            
+            // 加载安全设置
+            loadSecuritySettings();
+        }
+        
+        // 加载安全设置
+        function loadSecuritySettings() {
+            const settings = JSON.parse(localStorage.getItem('appSettings') || '{}');
+            const securitySettings = settings.security || {
+                autoLockTime: '1分钟',
+                enableAutoBackup: false,
+                enableMinimizeLock: false,
+                minimizeLockDelay: 0 // 默认立即锁定
+            };
+            
+            // 更新界面
+            const autoLockTimeSelect = document.querySelector('#securitySetting select');
+            const enableAutoBackupCheckbox = document.querySelector('#securitySetting input[type="checkbox"]');
+            const enableMinimizeLockCheckbox = document.getElementById('enableMinimizeLock');
+            const minimizeLockDelaySelect = document.getElementById('minimizeLockDelay');
+            
+            if (autoLockTimeSelect) {
+                autoLockTimeSelect.value = securitySettings.autoLockTime;
+            }
+            
+            if (enableAutoBackupCheckbox) {
+                enableAutoBackupCheckbox.checked = securitySettings.enableAutoBackup;
+            }
+            
+            if (enableMinimizeLockCheckbox) {
+                enableMinimizeLockCheckbox.checked = securitySettings.enableMinimizeLock;
+            }
+            
+            if (minimizeLockDelaySelect) {
+                minimizeLockDelaySelect.value = securitySettings.minimizeLockDelay;
+            }
+            
+            console.log('🔒 已加载安全设置:', securitySettings);
+        }
+        
+        // 自动锁定计时器相关变量
+        let autoLockTimer = null;
+        let lastActivityTime = Date.now();
+        
+        // 最小化锁定相关变量
+        let minimizeLockTimer = null;
+        let isMinimized = false;
+        
+        // 初始化自动锁定计时器
+        function initAutoLockTimer() {
+            // 清除现有计时器
+            if (autoLockTimer) {
+                clearTimeout(autoLockTimer);
+            }
+            
+            // 获取自动锁定时间设置
+            const settings = JSON.parse(localStorage.getItem('appSettings') || '{}');
+            const autoLockTime = settings.security?.autoLockTime || '1分钟';
+            
+            // 转换为毫秒
+            const lockTimeMs = getLockTimeInMs(autoLockTime);
+            
+            // 如果设置为"从不"，则不启动计时器
+            if (lockTimeMs === 0) {
+                console.log('🔒 自动锁定已禁用');
+                return;
+            }
+            
+            // 启动计时器
+            autoLockTimer = setTimeout(() => {
+                // 检查是否需要锁定（如果用户在计时期间有活动，则重置计时器）
+                const currentTime = Date.now();
+                if (currentTime - lastActivityTime >= lockTimeMs) {
+                    console.log('🔒 自动锁定触发');
+                    lockApplication();
+                } else {
+                    // 用户有活动，重新启动计时器
+                    initAutoLockTimer();
+                }
+            }, lockTimeMs);
+            
+            console.log(`🔒 自动锁定计时器已启动，将在 ${autoLockTime} 后锁定`);
+        }
+        
+        // 重置自动锁定计时器
+        function resetAutoLockTimer() {
+            lastActivityTime = Date.now();
+            initAutoLockTimer();
+        }
+        
+        // 将自动锁定时间转换为毫秒
+        function getLockTimeInMs(lockTime) {
+            switch (lockTime) {
+                case '1分钟':
+                    return 1 * 60 * 1000;
+                case '5分钟':
+                    return 5 * 60 * 1000;
+                case '10分钟':
+                    return 10 * 60 * 1000;
+                case '30分钟':
+                    return 30 * 60 * 1000;
+                case '1小时':
+                    return 60 * 60 * 1000;
+                case '从不':
+                    return 0;
+                default:
+                    return 5 * 60 * 1000; // 默认5分钟
+            }
+        }
+        
+        // 加载自定义背景
+        function loadCustomBackground() {
+            let backgroundSettings = null;
+            
+            // 先尝试从新的appSettings中加载
+            const appSettings = JSON.parse(localStorage.getItem('appSettings') || '{}');
+            if (appSettings.appearance && appSettings.appearance.customBackground) {
+                backgroundSettings = appSettings.appearance.customBackground;
+            } else {
+                // 向后兼容：尝试从旧的customBackground中加载
+                backgroundSettings = JSON.parse(localStorage.getItem('customBackground'));
+            }
+            
+            if (backgroundSettings && backgroundSettings.applied) {
+                // 应用背景到页面
+                document.body.style.backgroundImage = `url(${backgroundSettings.url})`;
+                document.body.style.backgroundSize = backgroundSettings.size;
+                document.body.style.backgroundPosition = 'center';
+                document.body.style.backgroundRepeat = 'no-repeat';
+                document.body.style.backgroundAttachment = 'fixed';
+                
+                // 更新预览
+                const backgroundPreview = document.getElementById('backgroundPreview');
+                if (backgroundPreview) {
+                    backgroundPreview.style.backgroundImage = `url(${backgroundSettings.url})`;
+                    backgroundPreview.style.backgroundSize = backgroundSettings.size;
+                    backgroundPreview.style.backgroundPosition = 'center';
+                    backgroundPreview.innerHTML = '';
+                }
+            }
+        }
+        
+        // 重置为默认背景
+        function resetBackground() {
+            // 清除页面背景
+            document.body.style.backgroundImage = '';
+            document.body.style.backgroundSize = '';
+            document.body.style.backgroundPosition = '';
+            document.body.style.backgroundRepeat = '';
+            document.body.style.backgroundAttachment = '';
+            
+            // 清除localStorage中的背景设置
+            localStorage.removeItem('customBackground');
+            
+            // 同时更新appSettings
+            const appSettings = JSON.parse(localStorage.getItem('appSettings') || '{}');
+            if (appSettings.appearance) {
+                appSettings.appearance.customBackground = null;
+                localStorage.setItem('appSettings', JSON.stringify(appSettings));
+            }
+            
+            // 更新预览
+            const backgroundPreview = document.getElementById('backgroundPreview');
+            if (backgroundPreview) {
+                backgroundPreview.style.backgroundImage = '';
+                backgroundPreview.innerHTML = '<span style="color: var(--ios-text-tertiary);">当前无自定义背景</span>';
+            }
+            
+            message.success('已恢复默认背景');
+        }
 
         // 处理登录
         async function handleLogin() {
@@ -909,20 +1741,46 @@
 
         // 处理忘记主密码
         async function handleForgotPassword() {
-            // 显示确认对话框
-            const confirmMessage = `注意：
-1. 由于加密原理限制，忘记主密码后无法恢复已保存的密码
-2. 点击确定后，所有本地数据将被清除
-3. 您需要重新设置主密码
-
-确定要继续吗？`;
+            // 创建自定义iOS风格确认对话框
+            const modal = document.createElement('div');
+            modal.className = 'secondary-auth-modal';
+            modal.innerHTML = `
+                <div class="secondary-auth-modal-content">
+                    <h3>忘记主密码</h3>
+                    <p style="color: var(--ios-text-secondary); margin-bottom: 20px;">
+                        请仔细阅读以下内容：
+                    </p>
+                    <div style="background-color: #FFF3CD; border: 1px solid #FFEEBA; border-radius: var(--ios-corner-medium); padding: 16px; margin-bottom: 20px;">
+                        <p style="color: #856404; margin-bottom: 12px;"><strong>⚠️ 重要后果</strong></p>
+                        <ul style="color: #856404; margin: 0; padding-left: 20px; line-height: 1.6;">
+                            <li>由于加密原理限制，<strong>忘记主密码后无法恢复已保存的密码</strong></li>
+                            <li>点击"确认清除"后，<strong>所有本地数据将被永久清除</strong></li>
+                            <li>清除后您需要重新设置主密码</li>
+                            <li>此操作<strong>不可撤销</strong></li>
+                        </ul>
+                    </div>
+                    <div class="secondary-auth-modal-buttons">
+                        <button class="btn btn-cancel" style="flex: 1;">取消</button>
+                        <button class="btn btn-danger" style="flex: 1;">确认清除</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
             
-            // 使用原生confirm，因为我们需要阻塞行为
-            if (confirm(confirmMessage)) {
+            // 绑定取消按钮事件
+            modal.querySelector('.btn-cancel').addEventListener('click', () => {
+                document.body.removeChild(modal);
+            });
+            
+            // 绑定确认按钮事件
+            modal.querySelector('.btn-danger').addEventListener('click', async () => {
                 try {
+                    // 显示正在处理的提示
+                    message.info('正在清除数据...');
+                    
                     const result = await window.passwordManager.forgotMasterPassword();
                     if (result.success) {
-                        message.success(result.message);
+                        message.success('数据已清除，您可以重新设置主密码');
                         // 重新显示主密码设置界面
                         authScreen.style.display = 'none';
                         setupScreen.style.display = 'block';
@@ -932,8 +1790,10 @@
                 } catch (error) {
                     console.error('Forgot password error:', error);
                     message.error('操作失败：' + error.message);
+                } finally {
+                    document.body.removeChild(modal);
                 }
-            }
+            });
         }
 
         // 处理主密码设置成功后的逻辑
@@ -1637,6 +2497,244 @@
                 resolve(true);
             });
         };
+        
+        // 背景设置模态框控制
+        function showSettingsModal() {
+            const modal = document.getElementById('settingsModal');
+            modal.style.display = 'flex';
+            // 加载当前背景设置
+            loadCurrentBackgroundSettings();
+        }
+        
+        function closeSettingsModal() {
+            const modal = document.getElementById('settingsModal');
+            modal.style.display = 'none';
+            // 重置文件输入
+            document.getElementById('backgroundFileInput').value = '';
+        }
+        
+        // 读取文件为DataURL
+        function readFileAsDataURL(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        // 压缩图片
+        function compressImage(imageUrl, maxWidth) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    if (width > maxWidth) {
+                        height = Math.round((height * maxWidth) / width);
+                        width = maxWidth;
+                    }
+                    
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    resolve(canvas.toDataURL('image/jpeg', 0.9));
+                };
+                img.src = imageUrl;
+            });
+        }
+        
+        // 处理文件选择
+        async function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+            if (!validTypes.includes(file.type)) {
+                message.error('不支持的文件类型，请选择JPG、PNG或WebP格式的图片');
+                return;
+            }
+            
+            const maxSize = 10 * 1024 * 1024;
+            if (file.size > maxSize) {
+                message.error('文件大小超过限制（最大10MB）');
+                return;
+            }
+            
+            try {
+                const imageUrl = await readFileAsDataURL(file);
+                const compressedUrl = await compressImage(imageUrl, 1920);
+                
+                const preview = document.getElementById('backgroundPreview');
+                const backgroundSize = document.getElementById('backgroundSize').value;
+                
+                preview.style.backgroundImage = `url(${compressedUrl})`;
+                preview.style.backgroundSize = backgroundSize;
+                preview.style.backgroundPosition = 'center';
+                preview.style.backgroundRepeat = 'no-repeat';
+                preview.dataset.backgroundUrl = compressedUrl;
+                
+                message.success('图片已加载');
+            } catch (error) {
+                console.error('处理图片失败:', error);
+                message.error('图片处理失败，请重试');
+            }
+        }
+        
+        // 更新预览尺寸
+        function updatePreviewSize() {
+            const preview = document.getElementById('backgroundPreview');
+            const backgroundSize = document.getElementById('backgroundSize').value;
+            const backgroundUrl = preview.dataset.backgroundUrl;
+            
+            if (backgroundUrl) {
+                preview.style.backgroundSize = backgroundSize;
+            }
+        }
+        
+        // 应用背景
+        function applyBackground() {
+            const preview = document.getElementById('backgroundPreview');
+            const backgroundUrl = preview.dataset.backgroundUrl;
+            const backgroundSize = document.getElementById('backgroundSize').value;
+            
+            if (!backgroundUrl) {
+                message.error('请先选择一张图片');
+                return;
+            }
+            
+            document.body.style.backgroundImage = `url(${backgroundUrl})`;
+            document.body.style.backgroundSize = backgroundSize;
+            document.body.style.backgroundPosition = 'center';
+            document.body.style.backgroundRepeat = 'no-repeat';
+            document.body.style.backgroundAttachment = 'fixed';
+            
+            localStorage.setItem('customBackground', JSON.stringify({
+                url: backgroundUrl,
+                size: backgroundSize,
+                applied: true
+            }));
+            
+            message.success('背景已应用');
+            closeSettingsModal();
+        }
+        
+        // 重置为默认背景
+        function resetBackground() {
+            document.body.style.backgroundImage = '';
+            document.body.style.backgroundSize = '';
+            document.body.style.backgroundPosition = '';
+            document.body.style.backgroundRepeat = '';
+            document.body.style.backgroundAttachment = '';
+            
+            localStorage.removeItem('customBackground');
+            
+            const preview = document.getElementById('backgroundPreview');
+            preview.style.backgroundImage = '';
+            preview.dataset.backgroundUrl = '';
+            
+            message.success('已恢复默认背景');
+        }
+        
+        // 加载当前背景设置
+        function loadCurrentBackgroundSettings() {
+            const settings = JSON.parse(localStorage.getItem('customBackground'));
+            if (settings && settings.applied) {
+                const preview = document.getElementById('backgroundPreview');
+                const backgroundSizeSelect = document.getElementById('backgroundSize');
+                
+                preview.style.backgroundImage = `url(${settings.url})`;
+                preview.style.backgroundSize = settings.size;
+                preview.dataset.backgroundUrl = settings.url;
+                backgroundSizeSelect.value = settings.size;
+            }
+        }
+        
+        // 初始化背景
+        function initBackground() {
+            const settings = JSON.parse(localStorage.getItem('customBackground'));
+            if (settings && settings.applied) {
+                document.body.style.backgroundImage = `url(${settings.url})`;
+                document.body.style.backgroundSize = settings.size;
+                document.body.style.backgroundPosition = 'center';
+                document.body.style.backgroundRepeat = 'no-repeat';
+                document.body.style.backgroundAttachment = 'fixed';
+            }
+        }
+        
+        // 初始化背景
+        initBackground();
     </script>
+    
+    <!-- 设置界面 -->
+    <div id="settingsScreen" class="container" style="display: none;">
+        <header>
+            <button class="btn btn-small" onclick="showPasswordManagerScreen()" style="position: absolute; left: 20px; top: 16px;">
+                <span class="btn-icon">←</span> 返回
+            </button>
+            <h1>设置</h1>
+        </header>
+        <div class="settings-layout">
+            <!-- 左侧设置项导航 -->
+            <div class="settings-sidebar">
+                <button class="settings-item active" onclick="showSetting('background')">背景设置</button>
+                <!-- 后续可添加其他设置项 -->
+                <!-- <button class="settings-item" onclick="showSetting('security')">安全设置</button> -->
+                <!-- <button class="settings-item" onclick="showSetting('appearance')">外观设置</button> -->
+                <!-- <button class="settings-item" onclick="showSetting('about')">关于</button> -->
+            </div>
+            <!-- 右侧设置内容区 -->
+            <div class="settings-content">
+                <!-- 背景设置内容 -->
+                <div id="background-settings" class="settings-section">
+                    <h3>自定义背景图片</h3>
+                    <!-- 背景预览区域 -->
+                    <div id="backgroundPreview" style="
+                        width: 100%; 
+                        height: 200px; 
+                        border: 1px solid var(--ios-gray-light); 
+                        border-radius: var(--ios-corner-large); 
+                        margin: 20px 0; 
+                        overflow: hidden; 
+                        background-size: cover; 
+                        background-position: center; 
+                        background-repeat: no-repeat;
+                        box-shadow: var(--ios-shadow-sm);
+                    "></div>
+                    <!-- 背景尺寸调整选项 -->
+                    <div class="form-group">
+                        <label for="backgroundSize">背景尺寸</label>
+                        <select id="backgroundSize" style="
+                            width: 100%; 
+                            padding: 12px; 
+                            border: 1px solid var(--ios-gray-light); 
+                            border-radius: var(--ios-corner-large); 
+                            font-size: 14px; 
+                            background-color: var(--ios-card);
+                        " onchange="updatePreviewSize()">
+                            <option value="cover" selected>覆盖（铺满屏幕，保持比例）</option>
+                            <option value="contain">包含（完整显示，保持比例）</option>
+                            <option value="stretch">拉伸（铺满屏幕，不保持比例）</option>
+                            <option value="center">居中（居中显示，原始尺寸）</option>
+                        </select>
+                    </div>
+                    <!-- 隐藏的文件选择器 -->
+                    <input type="file" id="backgroundFileInput" accept="image/jpeg, image/png, image/webp" style="display: none;" onchange="handleFileSelect(event)">
+                    <!-- 操作按钮 -->
+                    <div class="settings-buttons" style="display: flex; flex-direction: column; gap: 12px; margin-top: 24px;">
+                        <button class="btn btn-primary" onclick="document.getElementById('backgroundFileInput').click()">选择背景图片</button>
+                        <button class="btn btn-success" onclick="applyBackground()">应用为背景</button>
+                        <button class="btn btn-secondary" onclick="resetBackground()">重置为默认</button>
+                    </div>
+                </div>
+                <!-- 后续可添加其他设置内容 -->
+            </div>
+        </div>
+    </div>
 </body>
 </html>
