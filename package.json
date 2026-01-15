@@ -1,6 +1,6 @@
 {
   "name": "PassBox",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A local password manager built with Electron",
   "main": "main.js",
   "scripts": {
