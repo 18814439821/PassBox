@@ -20,5 +20,11 @@ contextBridge.exposeInMainWorld('passwordManager', {
   
   // 二次安全验证相关
   verifySecondaryPassword: (data) => ipcRenderer.invoke('verify-secondary-password', data),
-  updateSecondaryAuth: (data) => ipcRenderer.invoke('update-secondary-auth', data)
+  updateSecondaryAuth: (data) => ipcRenderer.invoke('update-secondary-auth', data),
+  
+  // 安全问题相关
+  setupSecurityQuestion: (data) => ipcRenderer.invoke('setup-security-question', data),
+  getSecurityQuestion: () => ipcRenderer.invoke('get-security-question'),
+  verifySecurityQuestion: (data) => ipcRenderer.invoke('verify-security-question', data),
+  resetMasterPasswordBySecurityQuestion: (data) => ipcRenderer.invoke('reset-master-password-by-security-question', data)
 });

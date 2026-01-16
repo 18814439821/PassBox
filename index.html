@@ -928,6 +928,21 @@
                         </div>
                     </div>
                     
+                    <!-- 透明度设置 -->
+                    <div style="margin-bottom: 24px;">
+                        <label style="display: block; margin-bottom: 12px; font-weight: 500;">界面透明度</label>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <input type="range" id="opacitySlider" min="0" max="100" value="100" step="1" style="flex: 1; padding: 8px 0; border-radius: var(--ios-corner-medium); border: 1px solid var(--ios-gray-light); background: var(--ios-background); font-size: 14px;">
+                            <input type="number" id="opacityInput" min="0" max="100" value="100" style="width: 80px; padding: 8px; border-radius: var(--ios-corner-medium); border: 1px solid var(--ios-gray-light); background: var(--ios-background); font-size: 14px; text-align: center;">
+                            <span id="opacityValue" style="min-width: 50px; font-weight: 600; color: var(--ios-primary);">100%</span>
+                        </div>
+                        <div id="opacityPreview" style="width: 100%; height: 100px; background-color: var(--ios-card); border-radius: var(--ios-corner-medium); margin-top: 12px; display: flex; justify-content: center; align-items: center; border: 1px solid var(--ios-gray-light); transition: opacity 0.3s ease;">
+                            <div style="background: var(--ios-background); padding: 20px; border-radius: var(--ios-corner-medium); width: 80%;">
+                                <p style="margin: 0; text-align: center; color: var(--ios-text-primary);">透明度预览</p>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- 保存和重置按钮 -->
                     <div style="display: flex; gap: 12px;">
                         <button class="btn btn-primary" onclick="saveSettings()" style="width: auto; min-width: 120px;">保存设置</button>
@@ -979,6 +994,34 @@
                         </div>
                     </div>
                     
+                    <!-- 安全问题设置 -->
+                    <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--ios-gray-light);">
+                        <h4 style="margin-bottom: 16px; font-size: 16px; font-weight: 600;">安全问题设置</h4>
+                        <div style="margin-bottom: 16px;">
+                            <label for="securityQuestionSelect" style="display: block; margin-bottom: 8px; font-weight: 500;">选择安全问题</label>
+                            <select id="securityQuestionSelect" style="width: 100%; padding: 8px; border-radius: var(--ios-corner-medium); border: 1px solid var(--ios-gray-light); background: var(--ios-background); font-size: 14px;">
+                                <option value="">-- 请选择安全问题 --</option>
+                                <option value="您的出生城市是？">您的出生城市是？</option>
+                                <option value="您的母亲的姓名是？">您的母亲的姓名是？</option>
+                                <option value="您第一只宠物的名字是？">您第一只宠物的名字是？</option>
+                                <option value="您最喜欢的颜色是？">您最喜欢的颜色是？</option>
+                                <option value="您的小学名称是？">您的小学名称是？</option>
+                                <option value="您最喜欢的电影是？">您最喜欢的电影是？</option>
+                                <option value="您最喜欢的食物是？">您最喜欢的食物是？</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <label for="securityQuestionAnswer" style="display: block; margin-bottom: 8px; font-weight: 500;">安全问题答案</label>
+                            <input type="text" id="securityQuestionAnswer" placeholder="请输入安全问题答案" style="width: 100%; padding: 10px; border-radius: var(--ios-corner-medium); border: 1px solid var(--ios-gray-light); background: var(--ios-background); font-size: 14px;">
+                        </div>
+                        <div id="currentSecurityQuestion" style="margin-bottom: 16px; padding: 12px; background-color: var(--ios-background); border-radius: var(--ios-corner-medium); display: none;">
+                            <p style="margin: 0; font-size: 14px; color: var(--ios-text-secondary);">
+                                已设置的安全问题：<strong id="currentQuestionText"></strong>
+                            </p>
+                        </div>
+                        <button class="btn btn-primary" onclick="saveSecurityQuestion()" style="width: auto; min-width: 120px;">保存安全问题</button>
+                    </div>
+                    
                     <!-- 保存设置按钮 -->
                     <div style="display: flex; gap: 12px; margin-top: 24px;">
                         <button class="btn btn-primary" onclick="saveSettings()" style="width: auto; min-width: 120px;">保存设置</button>
@@ -992,7 +1035,7 @@
                     <h3 style="margin-bottom: 24px; font-size: 20px; font-weight: 700;">关于 PassBox</h3>
                     
                     <div style="margin-bottom: 24px;">
-                        <p style="margin-bottom: 8px; font-size: 16px;">版本：1.0.0</p>
+                        <p style="margin-bottom: 8px; font-size: 16px;">版本：1.0.2</p>
                         <p style="font-size: 16px; color: var(--ios-text-secondary);">本地密码管理器，安全可靠</p>
                     </div>
                     
@@ -1005,7 +1048,61 @@
             </div>
         </div>
     </div>
-
+    
+    <!-- 安全问题验证界面 -->
+    <div id="securityQuestionVerificationScreen" style="display: none; height: 100vh; overflow: hidden; background-color: var(--ios-background);">
+        <div style="display: flex; flex-direction: column; height: 100%; max-width: 400px; margin: 0 auto; padding: 20px;">
+            <h2 style="text-align: center; margin-bottom: 24px; font-size: 24px; font-weight: 700;">验证安全问题</h2>
+            
+            <div style="background: var(--ios-card); border-radius: var(--ios-corner-large); padding: 24px; box-shadow: var(--ios-shadow-sm); margin-bottom: 20px;">
+                <p style="margin-bottom: 16px; color: var(--ios-text-secondary);">
+                    请回答您设置的安全问题，验证通过后可以修改主密码。
+                </p>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500;">安全问题</label>
+                    <div id="verificationQuestion" style="padding: 12px; background-color: var(--ios-background); border-radius: var(--ios-corner-medium); font-weight: 600; margin-bottom: 8px;"></div>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label for="verificationAnswer" style="display: block; margin-bottom: 8px; font-weight: 500;">答案</label>
+                    <input type="text" id="verificationAnswer" placeholder="请输入您的答案" style="width: 100%; padding: 10px; border-radius: var(--ios-corner-medium); border: 1px solid var(--ios-gray-light); background: var(--ios-background); font-size: 14px;">
+                </div>
+                <div id="verificationError" style="margin-bottom: 16px; padding: 12px; background-color: #FFF3CD; border: 1px solid #FFEEBA; border-radius: var(--ios-corner-medium); display: none;">
+                    <p style="color: #856404; margin: 0; font-size: 14px;"></p>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="verifySecurityQuestionAnswer()" style="width: 100%; margin-bottom: 12px;">验证答案</button>
+            <button class="btn btn-secondary" onclick="showLoginScreen()" style="width: 100%;">返回登录</button>
+        </div>
+    </div>
+    
+    <!-- 修改主密码界面 -->
+    <div id="resetMasterPasswordScreen" style="display: none; height: 100vh; overflow: hidden; background-color: var(--ios-background);">
+        <div style="display: flex; flex-direction: column; height: 100%; max-width: 400px; margin: 0 auto; padding: 20px;">
+            <h2 style="text-align: center; margin-bottom: 24px; font-size: 24px; font-weight: 700;">修改主密码</h2>
+            
+            <div style="background: var(--ios-card); border-radius: var(--ios-corner-large); padding: 24px; box-shadow: var(--ios-shadow-sm); margin-bottom: 20px;">
+                <p style="margin-bottom: 16px; color: var(--ios-text-secondary);">
+                    安全问题验证通过，请设置新的主密码。
+                </p>
+                <div style="margin-bottom: 16px;">
+                    <label for="newMasterPassword" style="display: block; margin-bottom: 8px; font-weight: 500;">新主密码</label>
+                    <input type="password" id="newMasterPassword" placeholder="请输入新主密码（至少8位）" style="width: 100%; padding: 10px; border-radius: var(--ios-corner-medium); border: 1px solid var(--ios-gray-light); background: var(--ios-background); font-size: 14px;">
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label for="confirmNewMasterPassword" style="display: block; margin-bottom: 8px; font-weight: 500;">确认新主密码</label>
+                    <input type="password" id="confirmNewMasterPassword" placeholder="请再次输入新主密码" style="width: 100%; padding: 10px; border-radius: var(--ios-corner-medium); border: 1px solid var(--ios-gray-light); background: var(--ios-background); font-size: 14px;">
+                </div>
+                <div id="resetPasswordError" style="margin-bottom: 16px; padding: 12px; background-color: #FFF3CD; border: 1px solid #FFEEBA; border-radius: var(--ios-corner-medium); display: none;">
+                    <p style="color: #856404; margin: 0; font-size: 14px;"></p>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="resetMasterPassword()" style="width: 100%; margin-bottom: 12px;">确认修改</button>
+            <button class="btn btn-secondary" onclick="showLoginScreen()" style="width: 100%;">返回登录</button>
+        </div>
+    </div>
+    
     <script>
         // 界面元素
         const authScreen = document.getElementById('authScreen');
@@ -1022,6 +1119,9 @@
         const passwordsList = document.getElementById('passwordsList');
 
         document.addEventListener('DOMContentLoaded', async () => {
+            // 初始化所有界面状态
+            initializeAllScreens();
+            
             // 检查是否已设置主密码
             const isSetup = await window.passwordManager.checkMasterPasswordSetup();
             
@@ -1033,6 +1133,34 @@
                 setupScreen.style.display = 'block';
             }
         });
+        
+        // 初始化所有界面状态
+        function initializeAllScreens() {
+            // 确保所有界面都在正确的初始状态
+            passwordManagerScreen.style.display = 'none';
+            settingsScreen.style.display = 'none';
+            addPasswordScreen.style.display = 'none';
+            savedPasswordsScreen.style.display = 'none';
+            
+            // 确保忘记密码相关界面是隐藏的
+            const securityQuestionVerificationScreen = document.getElementById('securityQuestionVerificationScreen');
+            if (securityQuestionVerificationScreen) {
+                securityQuestionVerificationScreen.style.display = 'none';
+            }
+            
+            const resetMasterPasswordScreen = document.getElementById('resetMasterPasswordScreen');
+            if (resetMasterPasswordScreen) {
+                resetMasterPasswordScreen.style.display = 'none';
+            }
+            
+            // 确保设置项内容是隐藏的
+            const settingContents = document.querySelectorAll('[id$="Setting"]');
+            settingContents.forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            console.log('🔍 所有界面已初始化为隐藏状态');
+        }
 
         // 处理主密码设置
         async function handleSetup() {
@@ -1119,6 +1247,11 @@
             if (targetContent) {
                 targetContent.style.display = 'block';
             }
+            
+            // 如果切换到安全设置，加载当前安全问题
+            if (settingName === 'security') {
+                loadCurrentSecurityQuestion();
+            }
         }
         
         // 应用锁定功能
@@ -1204,6 +1337,17 @@
             passwordManagerScreen.style.display = 'none';
             settingsScreen.style.display = 'none';
             
+            // 隐藏忘记密码相关界面
+            const securityQuestionVerificationScreen = document.getElementById('securityQuestionVerificationScreen');
+            if (securityQuestionVerificationScreen) {
+                securityQuestionVerificationScreen.style.display = 'none';
+            }
+            
+            const resetMasterPasswordScreen = document.getElementById('resetMasterPasswordScreen');
+            if (resetMasterPasswordScreen) {
+                resetMasterPasswordScreen.style.display = 'none';
+            }
+            
             // 隐藏设置项内容
             const settingContents = document.querySelectorAll('[id$="Setting"]');
             settingContents.forEach(content => {
@@ -1224,6 +1368,17 @@
             // 显示登录界面
             authScreen.style.display = 'block';
             setupScreen.style.display = 'none';
+            
+            // 隐藏忘记密码相关界面
+            const securityQuestionVerificationScreen = document.getElementById('securityQuestionVerificationScreen');
+            if (securityQuestionVerificationScreen) {
+                securityQuestionVerificationScreen.style.display = 'none';
+            }
+            
+            const resetMasterPasswordScreen = document.getElementById('resetMasterPasswordScreen');
+            if (resetMasterPasswordScreen) {
+                resetMasterPasswordScreen.style.display = 'none';
+            }
             
             // 确保登录错误信息已清除
             const loginError = document.getElementById('loginError');
@@ -1315,6 +1470,9 @@
                 settings.security.minimizeLockDelay = parseInt(minimizeLockDelaySelect.value);
             }
             
+            // 保存透明度设置
+            saveOpacitySettings(settings);
+            
             // 保存到localStorage
             localStorage.setItem('appSettings', JSON.stringify(settings));
             
@@ -1329,6 +1487,12 @@
             // 监听自定义背景图片选择
             const customBackgroundInput = document.getElementById('customBackground');
             const backgroundPreview = document.getElementById('backgroundPreview');
+            
+            // 初始化透明度设置
+            const opacitySlider = document.getElementById('opacitySlider');
+            const opacityInput = document.getElementById('opacityInput');
+            const opacityValue = document.getElementById('opacityValue');
+            const opacityPreview = document.getElementById('opacityPreview');
             
             if (customBackgroundInput && backgroundPreview) {
                 customBackgroundInput.addEventListener('change', (e) => {
@@ -1348,6 +1512,28 @@
             
             // 初始化背景预览尺寸
             updateBackgroundPreviewSize();
+            
+            // 初始化透明度设置
+            if (opacitySlider && opacityInput && opacityValue && opacityPreview) {
+                // 监听滑块变化
+                opacitySlider.addEventListener('input', (e) => {
+                    const value = e.target.value;
+                    opacityInput.value = value;
+                    opacityValue.textContent = value + '%';
+                    updateOpacityPreview(value);
+                });
+                
+                // 监听输入框变化
+                opacityInput.addEventListener('input', (e) => {
+                    let value = parseInt(e.target.value);
+                    if (isNaN(value)) value = 100;
+                    if (value < 0) value = 0;
+                    if (value > 100) value = 100;
+                    opacitySlider.value = value;
+                    opacityValue.textContent = value + '%';
+                    updateOpacityPreview(value);
+                });
+            }
             
             // 添加窗口大小变化监听
             window.addEventListener('resize', updateBackgroundPreviewSize);
@@ -1544,6 +1730,12 @@
             
             // 加载安全设置
             loadSecuritySettings();
+            
+            // 加载当前安全问题
+            loadCurrentSecurityQuestion();
+            
+            // 加载透明度设置
+            loadOpacitySettings();
         }
         
         // 加载安全设置
@@ -1711,6 +1903,301 @@
             
             message.success('已恢复默认背景');
         }
+        
+        // 保存安全问题
+        async function saveSecurityQuestion() {
+            const questionSelect = document.getElementById('securityQuestionSelect');
+            const answerInput = document.getElementById('securityQuestionAnswer');
+            
+            if (!questionSelect.value || !answerInput.value.trim()) {
+                message.error('请选择安全问题并输入答案');
+                return;
+            }
+            
+            try {
+                const result = await window.passwordManager.setupSecurityQuestion({
+                    question: questionSelect.value,
+                    answer: answerInput.value.trim()
+                });
+                
+                if (result.success) {
+                    message.success('安全问题已保存');
+                    answerInput.value = '';
+                    
+                    // 更新当前安全问题显示
+                    loadCurrentSecurityQuestion();
+                } else {
+                    message.error('保存失败：' + result.message);
+                }
+            } catch (error) {
+                console.error('Save security question error:', error);
+                message.error('操作失败：' + error.message);
+            }
+        }
+        
+        // 显示安全问题验证界面
+        function showSecurityQuestionVerification(question) {
+            const verificationScreen = document.getElementById('securityQuestionVerificationScreen');
+            const questionText = document.getElementById('verificationQuestion');
+            
+            // 设置安全问题文本
+            questionText.textContent = question;
+            
+            // 隐藏其他界面
+            authScreen.style.display = 'none';
+            passwordManagerScreen.style.display = 'none';
+            settingsScreen.style.display = 'none';
+            
+            // 显示验证界面
+            verificationScreen.style.display = 'block';
+            
+            // 清空输入和错误信息
+            document.getElementById('verificationAnswer').value = '';
+            const verificationError = document.getElementById('verificationError');
+            verificationError.style.display = 'none';
+        }
+        
+        // 验证安全问题答案
+        async function verifySecurityQuestionAnswer() {
+            const answerInput = document.getElementById('verificationAnswer');
+            const verificationError = document.getElementById('verificationError');
+            
+            if (!answerInput.value.trim()) {
+                message.error('请输入答案');
+                return;
+            }
+            
+            try {
+                const result = await window.passwordManager.verifySecurityQuestion({
+                    answer: answerInput.value.trim()
+                });
+                
+                if (result.success) {
+                    // 验证成功，显示修改主密码界面
+                    showResetMasterPasswordScreen();
+                } else {
+                    // 验证失败，显示错误提示
+                    verificationError.querySelector('p').textContent = '安全问题答案不正确，请重试';
+                    verificationError.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Verify security question error:', error);
+                message.error('验证失败：' + error.message);
+            }
+        }
+        
+        // 显示修改主密码界面
+        function showResetMasterPasswordScreen() {
+            const verificationScreen = document.getElementById('securityQuestionVerificationScreen');
+            const resetScreen = document.getElementById('resetMasterPasswordScreen');
+            
+            // 隐藏验证界面
+            verificationScreen.style.display = 'none';
+            
+            // 显示修改主密码界面
+            resetScreen.style.display = 'block';
+            
+            // 清空输入和错误信息
+            const newPasswordInput = document.getElementById('newMasterPassword');
+            const confirmPasswordInput = document.getElementById('confirmNewMasterPassword');
+            const resetPasswordError = document.getElementById('resetPasswordError');
+            
+            if (newPasswordInput) {
+                newPasswordInput.value = '';
+            }
+            
+            if (confirmPasswordInput) {
+                confirmPasswordInput.value = '';
+            }
+            
+            if (resetPasswordError) {
+                resetPasswordError.style.display = 'none';
+            }
+        }
+        
+        // 重置主密码
+        async function resetMasterPassword() {
+            const newPassword = document.getElementById('newMasterPassword').value;
+            const confirmPassword = document.getElementById('confirmNewMasterPassword').value;
+            const resetPasswordError = document.getElementById('resetPasswordError');
+            
+            // 验证输入
+            if (!newPassword || !confirmPassword) {
+                resetPasswordError.querySelector('p').textContent = '请填写所有字段';
+                resetPasswordError.style.display = 'block';
+                return;
+            }
+            
+            if (newPassword.length < 8) {
+                resetPasswordError.querySelector('p').textContent = '新密码长度至少为8个字符';
+                resetPasswordError.style.display = 'block';
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                resetPasswordError.querySelector('p').textContent = '两次输入的新密码不一致';
+                resetPasswordError.style.display = 'block';
+                return;
+            }
+            
+            try {
+                const result = await window.passwordManager.resetMasterPasswordBySecurityQuestion({
+                    newPassword: newPassword
+                });
+                
+                if (result.success) {
+                    message.success('主密码修改成功，请重新登录');
+                    
+                    // 清空表单
+                    document.getElementById('newMasterPassword').value = '';
+                    document.getElementById('confirmNewMasterPassword').value = '';
+                    
+                    // 返回登录界面
+                    showLoginScreen();
+                } else {
+                    resetPasswordError.querySelector('p').textContent = result.message;
+                    resetPasswordError.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Reset master password error:', error);
+                message.error('操作失败：' + error.message);
+            }
+        }
+        
+        // 加载当前安全问题
+        async function loadCurrentSecurityQuestion() {
+            try {
+                // 确保只在安全设置界面加载时执行
+                const securitySetting = document.getElementById('securitySetting');
+                if (!securitySetting || securitySetting.style.display === 'none') {
+                    console.log('🔍 安全设置界面未显示，跳过加载安全问题');
+                    return;
+                }
+                
+                console.log('🔍 开始加载安全问题信息...');
+                const securityQuestionInfo = await window.passwordManager.getSecurityQuestion();
+                console.log('🔍 获取到安全问题信息:', securityQuestionInfo);
+                
+                const currentSecurityQuestion = document.getElementById('currentSecurityQuestion');
+                const currentQuestionText = document.getElementById('currentQuestionText');
+                
+                if (securityQuestionInfo.hasQuestion) {
+                    console.log('🔍 显示已设置的安全问题:', securityQuestionInfo.question);
+                    currentSecurityQuestion.style.display = 'block';
+                    currentQuestionText.textContent = securityQuestionInfo.question;
+                } else {
+                    console.log('🔍 未设置安全问题');
+                    currentSecurityQuestion.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Load security question error:', error);
+            }
+        }
+        
+        // 加载透明度设置
+        function loadOpacitySettings() {
+            const settings = JSON.parse(localStorage.getItem('appSettings') || '{}');
+            const opacitySettings = settings.appearance?.opacity || 100;
+            
+            const opacitySlider = document.getElementById('opacitySlider');
+            const opacityInput = document.getElementById('opacityInput');
+            const opacityValue = document.getElementById('opacityValue');
+            
+            if (opacitySlider) {
+                opacitySlider.value = opacitySettings;
+            }
+            
+            if (opacityInput) {
+                opacityInput.value = opacitySettings;
+            }
+            
+            if (opacityValue) {
+                opacityValue.textContent = opacitySettings + '%';
+            }
+            
+            // 应用透明度到界面
+            applyOpacityToAllInterfaces(opacitySettings);
+            
+            console.log('🔍 已加载透明度设置:', opacitySettings + '%');
+        }
+        
+        // 更新透明度预览
+        function updateOpacityPreview(value) {
+            const opacityPreview = document.getElementById('opacityPreview');
+            if (!opacityPreview) return;
+            
+            const opacity = value / 100;
+            opacityPreview.style.opacity = opacity;
+        }
+        
+        // 应用透明度到所有界面
+        function applyOpacityToAllInterfaces(opacityPercent) {
+            const opacity = opacityPercent / 100;
+            
+            // 应用到登录界面
+            const authScreen = document.getElementById('authScreen');
+            if (authScreen) {
+                authScreen.style.opacity = opacity;
+            }
+            
+            // 应用到设置界面
+            const setupScreen = document.getElementById('setupScreen');
+            if (setupScreen) {
+                setupScreen.style.opacity = opacity;
+            }
+            
+            // 应用到密码管理界面
+            const passwordManagerScreen = document.getElementById('passwordManagerScreen');
+            if (passwordManagerScreen) {
+                passwordManagerScreen.style.opacity = opacity;
+            }
+            
+            // 应用到安全问题验证界面
+            const securityQuestionVerificationScreen = document.getElementById('securityQuestionVerificationScreen');
+            if (securityQuestionVerificationScreen) {
+                securityQuestionVerificationScreen.style.opacity = opacity;
+            }
+            
+            // 应用到修改主密码界面
+            const resetMasterPasswordScreen = document.getElementById('resetMasterPasswordScreen');
+            if (resetMasterPasswordScreen) {
+                resetMasterPasswordScreen.style.opacity = opacity;
+            }
+            
+            console.log('🔍 已应用透明度到所有界面:', opacityPercent + '%');
+        }
+        
+        // 保存透明度设置
+        function saveOpacitySettings(settings) {
+            const opacitySlider = document.getElementById('opacitySlider');
+            const opacityInput = document.getElementById('opacityInput');
+            
+            let opacityValue = 100;
+            
+            if (opacitySlider) {
+                opacityValue = parseInt(opacitySlider.value);
+            }
+            
+            if (opacityInput) {
+                opacityValue = parseInt(opacityInput.value);
+            }
+            
+            // 验证透明度值
+            if (isNaN(opacityValue)) opacityValue = 100;
+            if (opacityValue < 0) opacityValue = 0;
+            if (opacityValue > 100) opacityValue = 100;
+            
+            // 保存到设置
+            if (!settings.appearance) {
+                settings.appearance = {};
+            }
+            settings.appearance.opacity = opacityValue;
+            
+            // 应用透明度到界面
+            applyOpacityToAllInterfaces(opacityValue);
+            
+            console.log('🔍 已保存透明度设置:', opacityValue + '%');
+        }
 
         // 处理登录
         async function handleLogin() {
@@ -1741,7 +2228,66 @@
 
         // 处理忘记主密码
         async function handleForgotPassword() {
-            // 创建自定义iOS风格确认对话框
+            try {
+                // 检查是否已设置安全问题
+                const securityQuestionInfo = await window.passwordManager.getSecurityQuestion();
+                
+                if (securityQuestionInfo.hasQuestion) {
+                    // 已设置安全问题，显示选项
+                    showForgotPasswordOptions(securityQuestionInfo.question);
+                } else {
+                    // 未设置安全问题，显示清除数据确认
+                    showForgotPasswordClearData();
+                }
+            } catch (error) {
+                console.error('Forgot password error:', error);
+                message.error('操作失败：' + error.message);
+            }
+        }
+        
+        // 显示忘记主密码选项（已设置安全问题）
+        function showForgotPasswordOptions(question) {
+            const modal = document.createElement('div');
+            modal.className = 'secondary-auth-modal';
+            modal.innerHTML = `
+                <div class="secondary-auth-modal-content">
+                    <h3>忘记主密码</h3>
+                    <p style="color: var(--ios-text-secondary); margin-bottom: 20px;">
+                        您已设置安全问题，可以通过验证安全问题找回主密码，或者清除所有数据重新设置。
+                    </p>
+                    <div style="background-color: #D1ECF1; border: 1px solid #B8DAFF; border-radius: var(--ios-corner-medium); padding: 16px; margin-bottom: 20px;">
+                        <p style="color: #0C5460; margin-bottom: 8px;"><strong>ℹ️ 安全问题</strong></p>
+                        <p style="color: #0C5460; margin: 0;">${question}</p>
+                    </div>
+                    <div class="secondary-auth-modal-buttons">
+                        <button class="btn btn-cancel" style="flex: 1;">返回登录</button>
+                        <button class="btn btn-primary" style="flex: 1;">验证安全问题</button>
+                        <button class="btn btn-danger" style="flex: 1;">清除数据</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            // 绑定返回登录按钮事件
+            modal.querySelector('.btn-cancel').addEventListener('click', () => {
+                document.body.removeChild(modal);
+            });
+            
+            // 绑定验证安全问题按钮事件
+            modal.querySelector('.btn-primary').addEventListener('click', () => {
+                document.body.removeChild(modal);
+                showSecurityQuestionVerification(question);
+            });
+            
+            // 绑定清除数据按钮事件
+            modal.querySelector('.btn-danger').addEventListener('click', () => {
+                document.body.removeChild(modal);
+                showForgotPasswordClearData();
+            });
+        }
+        
+        // 显示清除数据确认（未设置安全问题）
+        function showForgotPasswordClearData() {
             const modal = document.createElement('div');
             modal.className = 'secondary-auth-modal';
             modal.innerHTML = `
@@ -1760,14 +2306,14 @@
                         </ul>
                     </div>
                     <div class="secondary-auth-modal-buttons">
-                        <button class="btn btn-cancel" style="flex: 1;">取消</button>
+                        <button class="btn btn-cancel" style="flex: 1;">返回登录</button>
                         <button class="btn btn-danger" style="flex: 1;">确认清除</button>
                     </div>
                 </div>
             `;
             document.body.appendChild(modal);
             
-            // 绑定取消按钮事件
+            // 绑定返回登录按钮事件
             modal.querySelector('.btn-cancel').addEventListener('click', () => {
                 document.body.removeChild(modal);
             });
@@ -1781,6 +2327,7 @@
                     const result = await window.passwordManager.forgotMasterPassword();
                     if (result.success) {
                         message.success('数据已清除，您可以重新设置主密码');
+                        document.body.removeChild(modal);
                         // 重新显示主密码设置界面
                         authScreen.style.display = 'none';
                         setupScreen.style.display = 'block';
@@ -1790,8 +2337,6 @@
                 } catch (error) {
                     console.error('Forgot password error:', error);
                     message.error('操作失败：' + error.message);
-                } finally {
-                    document.body.removeChild(modal);
                 }
             });
         }
